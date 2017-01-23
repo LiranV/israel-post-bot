@@ -108,7 +108,7 @@ def main():
     add_command(dispatcher, "help", help_menu, "Display help", "/help [command]", pass_args=True)
 
     # Handle all unknown commands
-    dispatcher.add_handler(MessageHandler([Filters.command], unknown))
+    dispatcher.add_handler(MessageHandler((Filters.command), unknown))
 
     dispatcher.add_error_handler(error)
 

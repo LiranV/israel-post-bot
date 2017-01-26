@@ -98,6 +98,11 @@ def add_command(dispatcher, name, callback, info, usage="", pass_args=False):
     dispatcher.add_handler(CommandHandler(name, callback, pass_args=pass_args))
 
 
+def unknown_message(bot, update):
+    message = "I'm sorry but I couldn't understand you.\nYou should probably try to look at '/help'"
+    bot.sendMessage(chat_id=update.message.chat_id, text=message)
+
+
 def main():
     updater = Updater(token=read_token())
     dispatcher = updater.dispatcher
@@ -109,6 +114,9 @@ def main():
 
     # Handle all unknown commands
     dispatcher.add_handler(MessageHandler((Filters.command), unknown))
+
+    # Handle all unknown messages
+    dispatcher.add_handler(MessageHandler((), unknown_message))
 
     dispatcher.add_error_handler(error)
 

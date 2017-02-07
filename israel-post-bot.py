@@ -29,7 +29,7 @@ def start_cmd(bot, update):
     logger.info("Received 'start' from user '{}'".format(update.message.from_user["id"]))
     users.add_user(update.message.from_user["id"], update.message.chat_id)
     start_message = ("Israel Post Telegram Bot at your service!\n"
-                    "For help type '/help'")
+                     "For help type '/help'")
     bot.sendMessage(chat_id=update.message.chat_id, text=start_message)
 
 
@@ -126,8 +126,8 @@ def get_tracking_information(tracking_id):
 
 
 def unknown_update(bot, update):
-    message = "I'm sorry but I didn't understand that.\n"
-    "Please refer to '/help' for the available commands."
+    message = ("I'm sorry but I didn't understand that.\n"
+               "Please refer to '/help' to see the available commands.")
     bot.sendMessage(chat_id=update.message.chat_id, text=message)
 
 

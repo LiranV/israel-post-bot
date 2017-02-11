@@ -62,12 +62,14 @@ def tracking_reply(bot, update):
     except ValueError as e:
         bot.sendMessage(chat_id=update.message.chat_id,
                         text="I'm sorry, but this tracking ID is invalid.\n"
-                        "You should try using '/track' again.")
+                        "You should try using '/track' again.",
+                        reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
 
     packages.update_package(user_id, tracking_id, tracking_text)
     bot.sendMessage(chat_id=update.message.chat_id,
-                    text=tracking_text)
+                    text=tracking_text,
+                    reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 

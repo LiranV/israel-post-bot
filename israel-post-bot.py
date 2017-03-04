@@ -47,6 +47,26 @@ def track_cmd(bot, update):
     return CHOOSING
 
 
+def delete_cmd(bot, update):
+    user_id = update.message.from_user["id"]
+    custom_keyboard = []
+    packages.get_tracking_id_list(user_id)
+    ids_list = packages.get_tracking_id_list(user_id)
+    if ids_list:
+        reply_markup = ReplyKeyboardMarkup(custom_keyboard, one_time_keyboard=True)
+        for tracking_id in ids_list:
+            custom_keyboard.append([tracking_id])
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text="You can send '/cancel' to end the conversation at any time.\n"
+                        "Please choose a package to delete:",
+                        reply_markup=reply_markup)
+        return CHOOSING
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text="There are no packages to remove.")
+        return ConversationHandler.END
+
+
 def get_new_tracking_id(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id,
                     text="Please send me the package tracking ID.",
@@ -73,6 +93,16 @@ def tracking_reply(bot, update):
     return ConversationHandler.END
 
 
+def delete_reply(bot, update):
+    user_id = update.message.from_user["id"]
+    tracking_id = update.message.text
+    packages.delete_package(user_id, tracking_id)
+    bot.sendMessage(chat_id=update.message.chat_id,
+                    text="Package '{}' was deleted.".format(tracking_id),
+                    reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+
 def gen_help_menu():
     global commands
     global HELP_MENU
@@ -90,6 +120,7 @@ def help_cmd(bot, update):
                  "/start - Display welcome message\n"
                  "/help - Display this message\n"
                  "/track - Track packages\n"
+                 "/delete - Delete a package from history\n"
                  "\nCreated by Liran Vaknin\n"
                  "[Project page on GitHub](https://github.com/LiranV/israel-post-bot)")
     bot.sendMessage(chat_id=update.message.chat_id,
@@ -151,8 +182,17 @@ def main():
         fallbacks=[CommandHandler("cancel", cancel_conversation)]
     )
 
+    delete_package_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler("delete", delete_cmd)],
+        states={
+            CHOOSING: [MessageHandler((Filters.text), delete_reply)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel_conversation)]
+    )
+
     # Register handlers
     dispatcher.add_handler(tracking_conversation_handler)
+    dispatcher.add_handler(delete_package_conversation_handler)
     dispatcher.add_handler(CommandHandler("start", start_cmd))
     dispatcher.add_handler(CommandHandler("help", help_cmd))
 
